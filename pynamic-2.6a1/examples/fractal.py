@@ -44,7 +44,7 @@ myYPixelRange[0] = int(mpi.rank*bmpSize[1]/mpi.procs)
 myYPixelRange[1] = int((mpi.rank+1)*bmpSize[1]/mpi.procs)
 
 if mpi.rank == 0:
-    print("Starting computation (groan)\n")
+    print("Starting computation...\n")
 
 #Now we can start to iterate over pixels!!
 myString = ""
