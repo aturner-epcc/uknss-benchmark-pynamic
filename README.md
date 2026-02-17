@@ -1,9 +1,28 @@
-# UK-NSS OSU Micro-Benchmark
+# UK-NSS Pynamic Benchmark
 
-**Note:** This benchmark/repository is closely based on the one used for the [NERSC-10 benchmarks](https://www.nersc.gov/systems/nersc-10/benchmarks/)
+Pynamic is a benchmark designed to test a system's ability
+to handle the Dynamic Linking and Loading requirements
+of Python-based scientific applications. 
+Pynamic includes a code generator that automatically
+generates Python C-extension dummy codes and a glue layer
+that facilitates linking and loading of the generated dynamic
+modules. Pynamic is configurable, enabling modeling the static
+properties of a specific code as described. It does not, however,
+model any significant computations of the target.
 
-The OSU micro-benchmark suite (OMB) tests the performance of network
-communication functions for MPI and other communication interfaces.
+The heart of Pynamic is a Python script that generates C files
+and compiles them into shared object libraries.  Each library
+contains a Python callable entry function as well as a number
+of utility functions.  The user can also enable cross library
+function calls with a command line argument. The Pynamic configure
+script then links these libraries into the pynamic executable
+and creates a  driver script to exercise the functions in the
+generated libraries. The user can specify the number of libraries
+to create, as well as the average number of utility functions
+per library, thus tailoring the benchmark to match some application
+of interest. Pynamic introduces randomness in the number of functions
+per module and the function signatures, thus ensuring some
+heterogeneity of the libraries and functions.
 
 ## Status
 
@@ -17,194 +36,215 @@ Stable
 
 ### Software
 
-- [OSU MPI Micro-Benchmarks](https://mvapich.cse.ohio-state.edu/benchmarks/)
+- [Pynamic](https://github.com/llnl/pynamic)
 
 ### Architectures
 
 - CPU: x86, Arm
-- GPU: NVIDIA, AMD, Intel
+- GPU: N/A
 
 ### Languages and programming models
 
 - Programming languages: C
-- Parallel models: MPI, CAF
-- Accelerator offload models: CUDA, ROCm, OpenACC
+- Parallel models: MPI
+- Accelerator offload models: N/A
 
 ## Building the benchmark
 
-**Important:** All results submitted should be based on the following version:
-
-- [OSU MPI Micro-Benchmarks 7.5.2](https://mvapich.cse.ohio-state.edu/download/mvapich/osu-micro-benchmarks-7.5.2.tar.gz)
+**Important:** All results submitted should be based on the version of Pynamic included
+in this repository
 
 Any modifications made to the source code and build/installation files must be 
-shared as part of the offerer submission.
+shared as part of the bidder submission.
 
 ### Permitted modifications
 
-The only permitted modifications allowed are those that
+The only permitted source code modifications allowed are those that
 modify the source code or build/installation files to resolve unavoidable compilation or
 runtime errors.
 
+Bidders may make use of tools such as [Spindle](https://github.com/llnl/Spindle) to
+improve performance for the benchmark if they wish.
+
 ### Manual build
 
-The OMB source code is distributed by the [MVAPICH
-website](https://mvapich.cse.ohio-state.edu/benchmarks/).
+You must have a working installation of [mpi4py](https://mpi4py.readthedocs.io/en/stable/)
+already installed to be able to install Pynamic as the Python 3 version of Pynamic requires
+mpi4py.
 
 We provide an example build process based on the process used to install on the
 [IsambardAI](https://docs.isambard.ac.uk/specs/#system-specifications-isambard-ai-phase-2) system.
-
-Downloaded and unpack the source code:
-
-```bash
-wget https://mvapich.cse.ohio-state.edu/download/mvapich/osu-micro-benchmarks-7.5.2.tar.gz
-tar -xzf osu-micro-benchmarks-7.5.2.tar.gz
-```
-
-Build the micro-benchmarks with GPU support via CUDA:
 
 ```bash
 module load craype-network-ofi
 module load PrgEnv-gnu 
 module load gcc-native/13.2 
 module load cray-mpich
-module load cuda/12.6
-module load craype-accel-nvidia90
 module load craype-arm-grace
 module load cray-python
-module load cray-fftw
 
-export CUDA_PATH=/opt/nvidia/hpc_sdk/Linux_aarch64/24.11/cuda/12.6
-
-export MPICH_GPU_SUPPORT_ENABLED=1
-
-../configure CC=cc CXX=CC FC=ftn \
-   --prefix=/projects/u6cb/benchmarks/OSU/7.5.2-gcc \
-   --enable-cuda \
-   --with-cuda-include=$CUDA_PATH/include \
-   --with-cuda-libpath=$CUDA_PATH/lib
-
-make -j16
-make -j16 install 
+./config_pynamic.py 900 1250 \
+        -e -u 350 1250 -n 150 \
+        --with-cc=cc --with-mpi4py -j 16
 ```
 
-The `--prefix` option will cause the micro-benchmark executables to
-be installed in a directory named `libexec/osu-micro-benchmarks` in
-the directory specified in the prefix option.
+The `config_pynamic.py` script to configure and build the benchmark
+has the following call structure:
 
-OMB provides a script named `get_local_rank` that may (optionally) used
-as a wrapper function when launching the OMB tests. Its purpose is to
-define an the `LOCAL_RANK` environment variable before starting the
-target executable (e.g. `osu_latency`). `LOCAL_RANK` enumerates the
-ranks on each node so that the MPI library can control affinity between
-ranks and processors. Different MPI launchers expose the local rank
-information in different ways, and
-`libexec/osu-micro-benchmarks/get_local_rank` should be modified
-accordingly. Notes describing the appropriate modifications are included
-within the `get_local_rank` script.
+```
+config_pynamic.py <num_files> <avg_num_functions> [options] [-c <configure_options>]
 
-As an example, on IsambardAI, MPI jobs are started using the SLURM PMI, and
-the `LOCAL_RANK` may be set using `export LOCAL_RANK=$SLURM_LOCALID`.
+              <num_files> = total number of shared objects to produce
+              <avg_num_functions> = average number of functions per shared object
+```
+
+The key options to `config_pynamic.py` are:
+
+```
+      -e
+              enables external functions to call across modules
+
+      -j <num_processes>
+              build in parallel with a max of <num_processes> processes
+
+      -n <length>
+              add <length> characters to the function names
+
+      -u <num_utility_mods> <avg_num_u_functions>
+              create <num_utility_mods> math library-like utility modules
+              with an average of <avg_num_u_functions> functions
+              NOTE: Number of python modules = <num_files> - <avg_num_u_functions>
+
+      --with-cc=<command>
+              use the C compiler located at <command> to build Pynamic modules.
+
+      --with-mpi4py
+              Build against mpi4py rather than pyMPI.  This requires the backing
+              python to have the mpi4py module installed, and is default when
+              building pynamic with Python3+.
+```
+
+The full set of options are documented in the
+[Pynamic README](https://github.com/llnl/pynamic/blob/master/pynamic.README).
+
 
 ## Running the benchmark
 
 
 ### Required Tests
 
-The full OMB suite tests numerous communication patterns. Only the
-benchmarks listed in the following table are required:
+The Pynamic build for the benchmark should use the following parameters:
 
+- `<num_files>` = 900
+- `<avg_num_functions>` = 1250
+- `<num_utility_mods>` = 350
+- `<avg_num_u_functions>` = 1250
+- `<length>` = 150
+- `--with-mpi4py`
 
-| Test                |Description| Message <br/> Size | Nodes <br> Used | Ranks <br> Used |
-|---                  |---        |---                |--- |--- |
-| osu_latency         | Point-to-Point <br/> Latency |  8  B | 2 | 1 per node |
-| osu_bibw            | Point-to-Point <br/> Bi-directional <br> bandwidth |  1 MB | 2 | 1 per node |
-| osu_mbw_mr          | Point-to-Point <br/> Multi-Bandwidth <br>& Message Rate | 16 KB | 2 | Host-to-Host (two tests) :<br>     - 1 per NIC<br/>    - 1 per core <br/> Device-to-Device (two tests):<br/>    - 1 per NIC<br/>    - 1 per accelerator |
-| osu_get_acc_latency | Point-to-Point <br/> One-sided Accumulate Latency |  8  B | 2 | 1 per node |
-| osu_allreduce       | All-reduce Latency | 8B, 25 MB | full-system | 1 per NIC |
-| osu_alltoall        | All-to-all Latency |  1 MB | full-system | 1 per NIC <br/> odd process count |
+This corresponds to running `config_pynamic.py` with the following options:
 
-For the point-to-point tests (those that that use two (2) nodes), the
-nodes should be the maximum distance (number of hops) apart in the
-network topology.
+```
+./config_pynamic.py 900 1250 \
+        -e -u 350 1250 -n 150 \
+        --with-mpi4py
+```
 
-For the all-to-all test, the total number of ranks must be odd in order
-to circumvent software optimisations that would avoid stressing the
-network bisection bandwidth. If the product Nodes_Used x NICs_per_node
-is even, then the number of ranks used should be one less than this
-product.
+Pynamic should be run using at least 99% of the compute nodes,
+and at least 1 MPI rank per NIC.
 
-On systems that include accelerator devices, the tests should be
-executed twice: once to test performance to and from host memory, and
-again to to measure latency to and from device memory. Toggling between
-these tests requires configuring and compiling with the appropriate
-option (see `./configure --help`).
+Bidders may make use of tools such as [Spindle](https://github.com/llnl/Spindle) to
+improve performance for the benchmark if they wish.
 
 ### Benchmark execution
 
-Examples of job scripts that run the required tests
-are located in the `run` directory.
-The job scripts should be edited to reflect
-the architecture of the target system as follows:
+Once Pynamic has been built, it should be launched in the usual way for any parallel
+executable. For example, using Slurm `srun`, the launch line could look like for a
+system with 4 NIC per node:
 
-- For all tests (`run_*.sh`),
-  specify the number of NICs per node
-  by setting the `j` variable`.
+```
+srun --hint=nomulithread --diatribution=block:block \
+     --nodes=512 --ntasks-per-node=4 --cpus-per-task=72 \
+     pynamic-mpi4py `date +%s`
+```
 
-- For point-to-point tests (`run_p2p_[host,accel].sh`),
-  specify a pair of maximally distant nodes
-  by setting the `SBATCH -w` option (or equivalent for other schedulers).
-  Note that selection of an appropriate pair of nodes
-  requires knowing the nodes' placement on the network topology.
-  Other mechanisms for controlling node placement (besides `-w`)
-  may be used if available.
-
-- For tests of collective operations (`run_coll_[host,accel].sh`),
-  specify the number of nodes in the full system
-  by setting the `SBATCH --nodes` option.
-
-- For point-to-point tests between host processors (`run_p2p_host.sh`),
-  specify the number of CPU cores per node
-  by setting the `k` variable.
-
-- For tests using accelerator devices (`run_[p2p,coll]_accel.sh`),
-  specify the number of devices per node
-  by setting the `a` variable.
-
-- For tests using accelerator devices (`run_[p2p,coll]_accel.sh`),
-  specify the device interface interface to be used
-  by providing the appropriate option to the `osu_<test>` command
-  (i.e. `-d[ROCm,CUDA,OpenACC]` ).
-
-Runtime options to control the execution of each test can be viewed by
-supplying the `--help` option. The number of iterations (`-i`) should not 
-be changed from its default value. The `-x` option should not be used to
-exclude warmup iterations; results should include the warmup iterations.
-If the test is using device memory, then it is enabled by the `-d`
-device option with the appropriate interface (e.g. `-d [ROCm, CUDA,
-OpenACC] D D`).
+We provide an example job submission script from runs on the
+[IsambardAI](https://docs.isambard.ac.uk/specs/#system-specifications-isambard-ai-phase-2) system
+in the [run](./run) directory.
 
 ## Reporting Results
 
-The offeror should provide:
+The primary figure of merit for the Pynamic benchmark is the "module import time"
+in seconds.
 
-- Details of any changes made to the OSU micro-benchmark source code
+The bidder should provide:
+
+- Details of any changes made to the Pynamic source code
   and modifications to any build files (e.g. configure scripts, makefiles)
-- Details of the build process for the OSU micro-benchmark software 
-  for both the host-to-host and device-to-device versions
+- Details of the build process for the Pynamic software 
 - Details on how the tests were run, including any batch job submission
-  scripts
-- The benchmark results
+  scripts and use of any additional Python performance tolls such as
+  Spindle
+- All output to STDOUT from the Pynamic benchmark including the 
+  "module import time" figure of merit.
 
 ## Example performance data
 
 The following example performance data is from the IsambardAI system
 
-- Point-to-point, accelerator: [example_output/OMB_p2p_accel-2252830.out](example_output/OMB_p2p_accel-2252830.out)
-- Point-to-point, host: [example_output/OMB_p2p_host-2252822.out](example_output/OMB_p2p_host-2252822.out)
-- Collectives, accelerator (512 nodes): [example_output/OMB_coll_accel-2253239.out](example_output/OMB_coll_accel-2253239.out)
-- Collectives, host (512 nodes):
+- [256 nodes, 4 MPI processes per node]()
 
 ## License
 
 This benchmark description and associated files are released under the
-MIT license.
+MIT license. 
+
+Pynamic License
+
+(Pynamic is built on pyMPI.  For pyMPI licensing information, please see
+pynamic-2.4a1/LICENSE.txt.  The following notice applies to the following
+files: pynamic-2.4a1/addall.c, pynamic-2.4a1/config_pynamic.py,
+ pynamic-2.4a1/get-symtab-sizes, pynamic-2.4a1/so_generator.py.)
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2007, The Regents of the University of California. 
+Produced at the Lawrence Livermore National Laboratory 
+Written by Gregory Lee, Dong Ahn, John Gyllenhaal, Bronis de Supinski. 
+UCRL-CODE-228991. 
+All rights reserved. 
+ 
+This file is part of Pynamic.   For details, contact Greg Lee (lee218@llnl.gov). 
+ 
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met: 
+ 
+* Redistributions of source code must retain the above copyright notice, this
+list of conditions and the disclaimer below.  
+* Redistributions in binary form must reproduce the above copyright notice, this
+list of conditions and the disclaimer (as noted below) in the documentation and/or
+other materials provided with the distribution.  
+* Neither the name of the UC/LLNL nor the names of its contributors may be used
+to endorse or promote products derived from this software without specific prior
+written permission. 
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT
+SHALL THE REGENTS OF THE UNIVERSITY OF CALIFORNIA, THE U.S. DEPARTMENT OF ENERGY OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+OR SERVICES;  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+
+ADDITIONAL BSD NOTICE
+
+1. This notice is required to be provided under our contract with the U.S. Department of Energy (DOE).  This work was produced at the University of California, Lawrence Livermore National Laboratory under Contract No. W-7405-ENG-48 with the DOE. 
+ 
+2. Neither the United States Government nor the University of California nor any of their employees, makes any warranty, express or implied, or assumes any liability or responsibility for the accuracy, completeness, or usefulness of any information, apparatus, product, or process disclosed, or represents that its use would not infringe privately-owned rights. 
+ 
+3.  Also, reference herein to any specific commercial products, process, or services by trade name, trademark, manufacturer or otherwise does not necessarily constitute or imply its endorsement, recommendation, or favoring by the United States Government or the University of California.  The views and opinions of authors expressed herein do not necessarily state or reflect those of the United States Government or the University of California, and shall not be used for advertising or product endorsement purposes. 
+
+
