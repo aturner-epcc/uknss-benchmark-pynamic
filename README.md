@@ -1,4 +1,4 @@
-# UK-NSS Pynamic Benchmark
+# UK-NNSS Pynamic Benchmark
 
 Pynamic is a benchmark designed to test a system's ability
 to handle the Dynamic Linking and Loading requirements
@@ -38,16 +38,6 @@ Stable
 
 - [Pynamic](https://github.com/llnl/pynamic)
 
-### Architectures
-
-- CPU: x86, Arm
-- GPU: N/A
-
-### Languages and programming models
-
-- Programming languages: C
-- Parallel models: MPI
-- Accelerator offload models: N/A
 
 ## Building the benchmark
 
