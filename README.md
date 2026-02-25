@@ -182,7 +182,8 @@ The bidder should provide:
 
 The following example performance data is from the IsambardAI system
 
-- [256 nodes, 4 MPI processes per node]()
+- [128 nodes, 4 MPI processes per node](example-output/isambardai-128nodes.out)
+- [512 nodes, 4 MPI processes per node](example-output/isambardai-512nodes.out)
 
 ## License
 
