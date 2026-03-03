@@ -32,9 +32,11 @@ Stable
 
 [@aturner-epcc](https://github.com/aturner-epcc)
 
-## Overview
+**Important:** Please do not contact the benchmark maintainers directly with any questions.
+All questions on the benchmark must be submitted via the procurement response mechanism.
 
-### Software
+
+## Software
 
 - [Pynamic](https://github.com/llnl/pynamic)
 
@@ -51,7 +53,8 @@ shared as part of the bidder submission.
 
 The only permitted source code modifications allowed are those that
 modify the source code or build/installation files to resolve unavoidable compilation or
-runtime errors.
+runtime errors. Any modifications must be fully documented (e.g., as a pull request, diff or patch file)
+and reported with the benchmark results.
 
 Bidders may make use of tools such as [Spindle](https://github.com/llnl/Spindle) to
 improve performance for the benchmark if they wish.
@@ -120,8 +123,7 @@ The full set of options are documented in the
 
 ## Running the benchmark
 
-
-### Required Tests
+### Required tests
 
 The Pynamic build for the benchmark should use the following parameters:
 
@@ -149,20 +151,13 @@ improve performance for the benchmark if they wish.
 ### Benchmark execution
 
 Once Pynamic has been built, it should be launched in the usual way for any parallel
-executable. For example, using Slurm `srun`, the launch line could look like for a
-system with 4 NIC per node:
-
-```
-srun --hint=nomulithread --diatribution=block:block \
-     --nodes=512 --ntasks-per-node=4 --cpus-per-task=72 \
-     pynamic-mpi4py `date +%s`
-```
+executable (e.g. using `srun` or `mpirun`).
 
 We provide an example job submission script from runs on the
 [IsambardAI](https://docs.isambard.ac.uk/specs/#system-specifications-isambard-ai-phase-2) system
 in the [run](./run) directory.
 
-## Reporting Results
+## Reporting results
 
 The primary figure of merit for the Pynamic benchmark is the "module import time"
 in seconds.
