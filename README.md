@@ -24,18 +24,6 @@ of interest. Pynamic introduces randomness in the number of functions
 per module and the function signatures, thus ensuring some
 heterogeneity of the libraries and functions.
 
-## Status
-
-Stable
-
-## Maintainers
-
-[@aturner-epcc](https://github.com/aturner-epcc)
-
-**Important:** Please do not contact the benchmark maintainers directly with any questions.
-All questions on the benchmark must be submitted via the procurement response mechanism.
-
-
 ## Software
 
 - [Pynamic](https://github.com/llnl/pynamic)
