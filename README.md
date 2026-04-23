@@ -1,5 +1,12 @@
 # UK-NNSS Pynamic Benchmark
 
+This repository contains information on the GRID benchmark for the UK NNSS
+procurement. 
+
+> [!IMPORTANT]
+> Please do not contact the benchmark or code maintainers directly with any questions. All questions must be submitted via the procurement response mechanism.
+
+## Benchmark Overview
 Pynamic is a benchmark designed to test a system's ability
 to handle the Dynamic Linking and Loading requirements
 of Python-based scientific applications. 
@@ -26,28 +33,16 @@ heterogeneity of the libraries and functions.
 
 ## Software
 
-- [Pynamic](https://github.com/llnl/pynamic)
+The required software is provided in this repository.
+
+Original git repository: [https://github.com/llnl/pynamic](https://github.com/llnl/pynamic)
+
+> [!CAUTION]
+> All results submitted should be based on the version of Pynamic included
+in this repository
 
 
 ## Building the benchmark
-
-**Important:** All results submitted should be based on the version of Pynamic included
-in this repository
-
-Any modifications made to the source code and build/installation files must be 
-shared as part of the bidder submission.
-
-### Permitted modifications
-
-The only permitted source code modifications allowed are those that
-modify the source code or build/installation files to resolve unavoidable compilation or
-runtime errors. Any modifications must be fully documented (e.g., as a pull request, diff or patch file)
-and reported with the benchmark results.
-
-Bidders may make use of tools such as [Spindle](https://github.com/llnl/Spindle) to
-improve performance for the benchmark if they wish.
-
-### Manual build
 
 You must have a working installation of [mpi4py](https://mpi4py.readthedocs.io/en/stable/)
 already installed to be able to install Pynamic as the Python 3 version of Pynamic requires
@@ -109,6 +104,17 @@ The full set of options are documented in the
 [Pynamic README](https://github.com/llnl/pynamic/blob/master/pynamic.README).
 
 
+### Pre-approved code modifications
+
+The only permitted source code modifications allowed are those that
+modify the source code or build/installation files to resolve unavoidable compilation or
+runtime errors. Any modifications must be fully documented (e.g., as a pull request, diff or patch file)
+and reported with the benchmark results.
+
+Bidders may make use of tools such as [Spindle](https://github.com/llnl/Spindle) to
+improve performance for the benchmark if they wish.
+
+
 ## Running the benchmark
 
 ### Required tests
@@ -133,9 +139,6 @@ This corresponds to running `config_pynamic.py` with the following options:
 Pynamic should be run using at least 99% of the compute nodes,
 and at least 1 MPI rank per NIC.
 
-Bidders may make use of tools such as [Spindle](https://github.com/llnl/Spindle) to
-improve performance for the benchmark if they wish.
-
 ### Benchmark execution
 
 Once Pynamic has been built, it should be launched in the usual way for any parallel
@@ -145,23 +148,10 @@ We provide an example job submission script from runs on the
 [IsambardAI](https://docs.isambard.ac.uk/specs/#system-specifications-isambard-ai-phase-2) system
 in the [run](./run) directory.
 
-## Reporting results
 
-The primary figure of merit for the Pynamic benchmark is the "module import time"
-in seconds.
+## Results
 
-The bidder should provide:
-
-- Details of any changes made to the Pynamic source code
-  and modifications to any build files (e.g. configure scripts, makefiles)
-- Details of the build process for the Pynamic software 
-- Details on how the tests were run, including any batch job submission
-  scripts and use of any additional Python performance tolls such as
-  Spindle
-- All output to STDOUT from the Pynamic benchmark including the 
-  "module import time" figure of merit.
-
-## Example performance data
+## Reference data
 
 The following example performance data is from the IsambardAI system
 
@@ -173,7 +163,7 @@ The following example performance data is from the IsambardAI system
 This benchmark description and associated files are released under the
 MIT license. 
 
-Pynamic License
+### Pynamic License
 
 (Pynamic is built on pyMPI.  For pyMPI licensing information, please see
 pynamic-2.4a1/LICENSE.txt.  The following notice applies to the following
