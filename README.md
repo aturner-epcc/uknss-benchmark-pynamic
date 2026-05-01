@@ -1,6 +1,6 @@
 # UK-NNSS Pynamic Benchmark
 
-This repository contains information on the GRID benchmark for the UK NNSS
+This repository contains information on the Pynamic benchmark for the UK NNSS
 procurement. 
 
 > [!IMPORTANT]
