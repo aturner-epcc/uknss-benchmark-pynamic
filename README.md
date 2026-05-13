@@ -151,11 +151,30 @@ in the [run](./run) directory.
 
 ## Results
 
+### Performance results
+Performance results can be extracted using the [validate.py](./validate.py) script. For example:
+
+```bash
+python3 ./validate.py example-output/isambardai-512nodes.out
+ 
+# Pynamic benchmark validation
+ 
+  Pynamic version     : 1.3.3
+  MPI tasks           : 2048
+ 
+  Validation: PASSED
+ 
+  Module import time : 1.0578055381774902 secs
+  Module visit time  : 10.863801717758179 secs
+  Total time         : 11.921607255935669 secs
+ 
+```
+
 ### Reference data
 
 #### Isambard-AI (GH200)
 
-| Nodes  | MPI Ranks | Import time (s) | Module load time (s) | Total time (s) |
+| Nodes  | MPI Ranks | Import time (s) | Visit time (s) | Total time (s) |
 |--------|-----------|----------|--------|--------|
 | 128    | 512       | 0.99331  | 10.589 | 11.582 |
 | 512    | 2048      | 1.0578   | 10.864 | 11.922 |
@@ -228,4 +247,4 @@ The following changes to this document have been made since initial release:
 
 | <div style="width:90px">Date</div> | Change |
 |-----------:|--------|
-| 2026-05-13 | Extracted Isambard-AI reference data into table. |
+| 2026-05-13 | Extracted Isambard-AI reference data into table. Added validation script. |
