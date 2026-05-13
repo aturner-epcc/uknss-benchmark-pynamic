@@ -151,12 +151,22 @@ in the [run](./run) directory.
 
 ## Results
 
-## Reference data
+### Reference data
 
-The following example performance data is from the IsambardAI system
+#### Isambard-AI (GH200)
 
+| Nodes  | MPI Ranks | Import time (s) | Module load time (s) | Total time (s) |
+|--------|-----------|----------|--------|--------|
+| 128    | 512       | 0.99331  | 10.589 | 11.582 |
+| 512    | 2048      | 1.0578   | 10.864 | 11.922 |
+
+> [!NOTE]
+> Values shown above have been truncated to 5 significant figures to aid readability. Please report values as given in Pynamic output.
+
+Full output for the above configurations is provided below:
 - [128 nodes, 4 MPI processes per node](example-output/isambardai-128nodes.out)
 - [512 nodes, 4 MPI processes per node](example-output/isambardai-512nodes.out)
+
 
 ## License
 
@@ -212,3 +222,10 @@ ADDITIONAL BSD NOTICE
 3.  Also, reference herein to any specific commercial products, process, or services by trade name, trademark, manufacturer or otherwise does not necessarily constitute or imply its endorsement, recommendation, or favoring by the United States Government or the University of California.  The views and opinions of authors expressed herein do not necessarily state or reflect those of the United States Government or the University of California, and shall not be used for advertising or product endorsement purposes. 
 
 
+## Changelog
+
+The following changes to this document have been made since initial release:
+
+| <div style="width:90px">Date</div> | Change |
+|-----------:|--------|
+| 2026-05-13 | Extracted Isambard-AI reference data into table. |
