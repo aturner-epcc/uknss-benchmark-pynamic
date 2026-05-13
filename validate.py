@@ -5,11 +5,13 @@ import sys
 
 EXPECTED_VERSION = "1.3.3"
 
-if len(sys.argv) > 1:
-    with open(sys.argv[1], "r") as f:
-        text = f.read()
-else:
-    text = sys.stdin.read()
+if len(sys.argv) != 2:
+    print("validate.py: test output correctness and extract timings for the UK-NNSS Pynamic benchmark.")
+    print("Usage: validate.py <pynamic-stdout>")
+    sys.exit(1)
+
+with open(sys.argv[1], "r") as f:
+    text = f.read()
 
 print("\n# Pynamic benchmark validation")
 
