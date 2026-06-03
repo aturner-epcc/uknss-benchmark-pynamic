@@ -247,4 +247,4 @@ The following changes to this document have been made since initial release:
 
 | <div style="width:90px">Date</div> | Change |
 |-----------:|--------|
-| 2026-05-13 | Extracted Isambard-AI reference data into table. Added validation script. |
+| 2026-06-03 | Extracted Isambard-AI reference data into table. Added validation script. |
