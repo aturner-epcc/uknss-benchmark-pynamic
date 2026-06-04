@@ -104,7 +104,7 @@ The full set of options are documented in the
 [Pynamic README](https://github.com/llnl/pynamic/blob/master/pynamic.README).
 
 
-### Pre-approved code modifications
+### Pre-approved code modifications
 
 The only permitted source code modifications allowed are those that
 modify the source code or build/installation files to resolve unavoidable compilation or
