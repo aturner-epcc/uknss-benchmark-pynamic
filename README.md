@@ -136,7 +136,7 @@ This corresponds to running `config_pynamic.py` with the following options:
         --with-mpi4py
 ```
 
-Pynamic should be run using 1024 ranks with at least 1 MPI rank per NIC.
+Pynamic should be run using 1024 ranks with 1 MPI rank per NIC.
 
 ### Benchmark execution
 
