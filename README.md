@@ -136,8 +136,7 @@ This corresponds to running `config_pynamic.py` with the following options:
         --with-mpi4py
 ```
 
-Pynamic should be run using at least 99% of the compute nodes,
-and at least 1 MPI rank per NIC.
+Pynamic should be run using 1024 ranks with 1 MPI rank per NIC.
 
 ### Benchmark execution
 
@@ -247,4 +246,5 @@ The following changes to this document have been made since initial release:
 
 | <div style="width:90px">Date</div> | Change |
 |-----------:|--------|
+| 2026-06-26 | Update required test configuration |
 | 2026-06-03 | Extracted Isambard-AI reference data into table. Added validation script. |
